@@ -28,3 +28,11 @@ ProjectionModel = 'DrosophilaDenoisingProjection'
 
 Specify the directory where model h5 files are located:
 BaseDir = 'Provide path to your model directory'
+
+Fitting image into memory:
+
+For certain images that do not fit into your GPU/CPU the variable n_tiles = (1,4,8) is chosen  to break the image into overlapping tiles, if you have a powerful GPU you can use n_tiles = (1,2,2) for restoration and n_tiles = (1,1,1) for projection, else you can leave this parameter unchanged.
+
+Instructions for using RestorationProjectionSubDirectory program:
+
+Use this program if you have a master directory with several subdirectories inside it. In this program you only specify the location of the master directory and then program then goes inside each subdirectory and saves the results inside each directory. Other instructions are the same as above.
