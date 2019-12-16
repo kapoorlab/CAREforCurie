@@ -1,0 +1,30 @@
+Instructions for using RestorationProjectionDirectory program:
+
+Use this program if you have a bunch of TIF (notice the capital letters) files in a single directory. If you have tif (notice the small letters) then change the program where it says: 
+
+Raw_path = os.path.join(masterdirLow, '*TIF')
+
+to
+
+Raw_path = os.path.join(masterdirLow, '*tif')
+
+To start the program you need to give the directory paths of where your images are, this program takes in 3D input images coming out of the microscope and then passses it through the restoration and projection pipeline to give as ouput both restoration and projection images. If you do not want to save the restoration 3D images then change the program where it says:
+
+saveRestorations = True
+
+to
+
+saveRestorations = False
+
+
+The input image directory path is here:
+
+masterdirLow = 'Provide path to your images'
+
+Load the h5 files for restoration and projection models:
+
+RestorationModel = 'BorialisS1S2FlorisMidNoiseModel'
+ProjectionModel = 'DrosophilaDenoisingProjection'
+
+Specify the directory where model h5 files are located:
+BaseDir = 'Provide path to your model directory'
