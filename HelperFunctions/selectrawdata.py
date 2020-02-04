@@ -135,7 +135,7 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
           Name = os.path.basename(os.path.splitext(fname)[0])
           y =   cv2.resize(x, dsize = (x.shape[1] * downsamplefactor, x.shape[0] * downsamplefactor ))
           save_tiff_imagej_compatible((SaveGTdir  + Name) , y,axes)
-          print('File saved GT: ' Name, 'size:' y.shape)  
+          print('File saved GT: ', Name, 'size:', y.shape)  
             
         filesLow = glob.glob(Low_path)
         filesLow.sort    
@@ -144,7 +144,7 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
           Name = os.path.basename(os.path.splitext(fname)[0])
           y =   cv2.resize(x, dsize = (x.shape[1] * downsamplefactor, x.shape[0] * downsamplefactor ))
           save_tiff_imagej_compatible((SaveLowdir  + Name) , y,axes)    
-          print('File saved Low: ' Name, 'size:' y.shape)    
+          print('File saved Low: ', Name, 'size:', y.shape)    
 
         
         
