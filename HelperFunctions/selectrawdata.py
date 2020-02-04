@@ -3,11 +3,15 @@ from six.moves import zip
 from tifffile import imread
 from collections import namedtuple
 import os
+import tqdm
+from glob import glob
 import numpy as np
+import cv2
 import collections
 from itertools import chain
 from keras.preprocessing.image import ImageDataGenerator
 from random import sample
+from csbdeep.io import save_tiff_imagej_compatible
 try:
     from pathlib import Path
     Path().expanduser()
@@ -110,6 +114,41 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
 
         return SelectRawData(_gen, n_images, description)
 
+    @staticmethod
+    def downsample_data(GTdir, Lowdir, SaveGTdir, SaveLowdir,pattern = '*.tif', axes = 'ZYX', downsamplefactor = 0.5, interpolationscheme = cv2.INTER_CUBIC ):
+        
+        GTimages = sorted(glob(GTdir +  pattern))
+        Lowimages = sorted(glob(Lowdir +  pattern))
+        
+        
+        Path(SaveGTdir).mkdir(exist_ok = True)
+        Path(SaveLowdir).mkdir(exist_ok = True)
+        print(Path(SaveGTdir))
+        print(Path(SaveLowdir))
+        GT_path = os.path.join(SaveGTdir, '*tif')
+        Low_path = os.path.join(SaveLowdir, '*tif')
+        
+        filesGT = glob.glob(GT_path)
+        filesGT.sort
+        for fname in filesGT:
+          x = imread(fname)
+          Name = os.path.basename(os.path.splitext(fname)[0])
+          y =   cv2.resize(x, dsize = (x.shape[1] * downsamplefactor, x.shape[0] * downsamplefactor ))
+          save_tiff_imagej_compatible((SaveGTdir  + Name) , y,axes)
+          print('File saved GT: ' Name, 'size:' y.shape)  
+            
+        filesLow = glob.glob(Low_path)
+        filesLow.sort    
+        for fname in filesLow:
+          x = imread(fname)
+          Name = os.path.basename(os.path.splitext(fname)[0])
+          y =   cv2.resize(x, dsize = (x.shape[1] * downsamplefactor, x.shape[0] * downsamplefactor ))
+          save_tiff_imagej_compatible((SaveLowdir  + Name) , y,axes)    
+          print('File saved Low: ' Name, 'size:' y.shape)    
+
+        
+        
+    
     @staticmethod
     def from_folder(basepath, source_dirs, target_dir, axes='CZYX', pattern='*.tif*', NumTrain = None, GenerateKeras=False):
         """Get pairs of corresponding TIFF images read from folders.
