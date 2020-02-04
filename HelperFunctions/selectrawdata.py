@@ -4,7 +4,7 @@ from tifffile import imread
 from collections import namedtuple
 import os
 import tqdm
-from glob import glob
+import glob
 import numpy as np
 import cv2
 import collections
@@ -116,24 +116,25 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
 
     @staticmethod
     def downsample_data(GTdir, Lowdir, SaveGTdir, SaveLowdir,pattern = '*.tif', axes = 'ZYX', downsamplefactor = 0.5, interpolationscheme = cv2.INTER_CUBIC ):
-        
-        GTimages = sorted(glob(GTdir +  pattern))
-        Lowimages = sorted(glob(Lowdir +  pattern))
+    
         
         
         Path(SaveGTdir).mkdir(exist_ok = True)
         Path(SaveLowdir).mkdir(exist_ok = True)
         print(Path(SaveGTdir))
         print(Path(SaveLowdir))
-        GT_path = os.path.join(SaveGTdir, '*tif')
-        Low_path = os.path.join(SaveLowdir, '*tif')
+        GT_path = os.path.join(GTdir, pattern)
+        Low_path = os.path.join(Lowdir, pattern)
         
         filesGT = glob.glob(GT_path)
         filesGT.sort
         for fname in filesGT:
           x = imread(fname)
-          Name = os.path.basename(os.path.splitext(fname)[0])
-          y =   cv2.resize(x, dsize = (x.shape[1] * downsamplefactor, x.shape[0] * downsamplefactor ))
+          y = np.zeros([x.shape[0],int(x.shape[1] * downsamplefactor),int(x.shape[2] * downsamplefactor)])
+          Name = os.path.basename(os.path.splitext(fname)[0])  
+          for i in range(x.shape[0]):
+            
+            y[i,:] =   cv2.resize(x[i,:], dsize = (int(x.shape[2] * downsamplefactor), int(x.shape[1] * downsamplefactor) ))
           save_tiff_imagej_compatible((SaveGTdir  + Name) , y,axes)
           print('File saved GT: ', Name, 'size:', y.shape)  
             
@@ -141,8 +142,12 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
         filesLow.sort    
         for fname in filesLow:
           x = imread(fname)
+          y = np.zeros([x.shape[0],int(x.shape[1] * downsamplefactor),int(x.shape[2] * downsamplefactor)])
           Name = os.path.basename(os.path.splitext(fname)[0])
-          y =   cv2.resize(x, dsize = (x.shape[1] * downsamplefactor, x.shape[0] * downsamplefactor ))
+          for i in range(x.shape[0]):
+            
+            y[i,:] =   cv2.resize(x[i,:], dsize = (int(x.shape[2] * downsamplefactor), int(x.shape[1] * downsamplefactor) ))
+          
           save_tiff_imagej_compatible((SaveLowdir  + Name) , y,axes)    
           print('File saved Low: ', Name, 'size:', y.shape)    
 
