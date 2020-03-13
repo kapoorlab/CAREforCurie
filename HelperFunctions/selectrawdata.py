@@ -115,7 +115,7 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
         return SelectRawData(_gen, n_images, description)
 
     @staticmethod
-    def downsample_data(GTdir, Lowdir, SaveGTdir, SaveLowdir,pattern = '*.tif', axes = 'ZYX', downsamplefactor = 0.5, interpolationscheme = cv2.INTER_CUBIC ):
+    def downsample_3Ddata(GTdir, Lowdir, SaveGTdir, SaveLowdir,pattern = '*.tif', axes = 'ZYX', downsamplefactor = 0.5, interpolationscheme = cv2.INTER_CUBIC ):
     
         
         
@@ -136,6 +136,42 @@ class SelectRawData(namedtuple('RawData' ,('generator' ,'size' ,'description')))
             
             y[i,:] =   cv2.resize(x[i,:], dsize = (int(x.shape[2] * downsamplefactor), int(x.shape[1] * downsamplefactor) ))
           save_tiff_imagej_compatible((SaveGTdir  + Name) , y,axes)
+          print('File saved GT: ', Name, 'size:', y.shape)  
+            
+        filesLow = glob.glob(Low_path)
+        filesLow.sort    
+        for fname in filesLow:
+          x = imread(fname)
+          y = np.zeros([x.shape[0],int(x.shape[1] * downsamplefactor),int(x.shape[2] * downsamplefactor)])
+          Name = os.path.basename(os.path.splitext(fname)[0])
+          for i in range(x.shape[0]):
+            
+            y[i,:] =   cv2.resize(x[i,:], dsize = (int(x.shape[2] * downsamplefactor), int(x.shape[1] * downsamplefactor) ))
+          
+          save_tiff_imagej_compatible((SaveLowdir  + Name) , y,axes)    
+          print('File saved Low: ', Name, 'size:', y.shape)    
+
+    @staticmethod
+    def downsample_2D3Ddata(GTdir, Lowdir, SaveGTdir, SaveLowdir,pattern = '*.tif', axes = 'ZYX', smallaxes = 'YX', downsamplefactor = 0.5, interpolationscheme = cv2.INTER_CUBIC ):
+    
+        
+        
+        Path(SaveGTdir).mkdir(exist_ok = True)
+        Path(SaveLowdir).mkdir(exist_ok = True)
+        print(Path(SaveGTdir))
+        print(Path(SaveLowdir))
+        GT_path = os.path.join(GTdir, pattern)
+        Low_path = os.path.join(Lowdir, pattern)
+        
+        filesGT = glob.glob(GT_path)
+        filesGT.sort
+        for fname in filesGT:
+          x = imread(fname)
+          Name = os.path.basename(os.path.splitext(fname)[0])  
+        
+            
+          y =   cv2.resize(x, dsize = (int(x.shape[1] * downsamplefactor), int(x.shape[0] * downsamplefactor) ))
+          save_tiff_imagej_compatible((SaveGTdir  + Name) , y,smallaxes)
           print('File saved GT: ', Name, 'size:', y.shape)  
             
         filesLow = glob.glob(Low_path)
